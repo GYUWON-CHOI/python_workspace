@@ -1,31 +1,23 @@
-import streamlit as st
-from news_crawler import crawl_news, create_dataframe
-from most_keywords import generate_wordcloud_from_url
+from flask import Flask, render_template, request, jsonify
+from crawling import crawl_news, create_dataframe
+from txt_converter import csv_to_txt
 
-url = "https://news.naver.com/main/ranking/popularDay.naver"
+app = Flask(__name__)
 
-st.title('SIMPLE NEWS')
-
-search = st.text_input("검색할 키워드를 입력해주세요:", "")
-page = 1
-page2 = 2
-
-if st.button('검색'):
-    if search:
-        st.write('검색 중...')
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        search = request.form['search']
+        page = int(request.form['page'])
+        page2 = int(request.form['page2'])
         news_titles, final_urls, news_contents, news_dates = crawl_news(search, page, page2)
-        st.write("검색된 기사 갯수: 총 ", (page2 + 1 - page) * 10, '개')
-        st.write("\n[뉴스 내용]")
-        st.write(news_contents)
+        csv_filename = create_dataframe(news_titles, final_urls, news_contents, news_dates, search)
+        txt_content = csv_to_txt(csv_filename)
+        txt_filename = f"{csv_filename.split('.')[0]}.txt"
+        with open(txt_filename, 'w', encoding='utf-8') as txt_file:
+            txt_file.write(txt_content)
+        return jsonify({"message": f"Text file '{txt_filename}' has been created."}), 200
+    return render_template('index.html')
 
-        news_df = create_dataframe(news_titles, final_urls, news_contents, news_dates, search)
-        
-        st.success("검색이 완료되었습니다.")
-        st.stop()
-    else:
-        st.warning("검색어를 입력해주세요.")
-
-# 워드클라우드 섹션 추가
-st.sidebar.title('Top KeyWord')  # 사이드바에 제목 추가
-fig = generate_wordcloud_from_url(url)
-st.pyplot(fig)  # 워드클라우드 생성 함수 호출하여 출력
+if __name__ == "__main__":
+    app.run(debug=True)

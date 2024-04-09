@@ -108,5 +108,6 @@ def create_dataframe(news_titles, final_urls, news_contents, news_dates, search)
     news_df = pd.DataFrame({'date': news_dates, 'title': news_titles, 'link': final_urls, 'content': news_contents})
     news_df = news_df.drop_duplicates(keep='first', ignore_index=True)
     now = datetime.datetime.now()
-    news_df.to_csv('{}_{}.csv'.format(search, now.strftime('%Y%m%d_%H시%M분%S초')), encoding='utf-8-sig', index=False)
-    return news_df
+    csv_filename = '{}_{}.csv'.format(search, now.strftime('%Y%m%d_%H시%M분%S초'))
+    news_df.to_csv(csv_filename, encoding='utf-8-sig', index=False)
+    return csv_filename

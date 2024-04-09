@@ -35,8 +35,8 @@ def generate_wordcloud_from_url(url, top_n=30):
     # 워드 클라우드 생성
     wordCloud = WordCloud(
         font_path="malgun",  # 폰트 지정
-        width=400,  # 워드 클라우드의 너비 지정
-        height=400,  # 워드클라우드의 높이 지정
+        width=800,  # 워드 클라우드의 너비 지정
+        height=600,  # 워드클라우드의 높이 지정
         max_font_size=100,  # 가장 빈도수가 높은 단어의 폰트 사이즈 지정
         background_color='white'  # 배경색 지정
     ).generate_from_frequencies(word_counts)  # 워드 클라우드 빈도수 지정
@@ -47,3 +47,5 @@ def generate_wordcloud_from_url(url, top_n=30):
     plt.axis('off')
     plt.show()
     return pig
+
+generate_wordcloud_from_url('https://news.naver.com/main/ranking/popularDay.naver')
