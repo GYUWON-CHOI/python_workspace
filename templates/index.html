@@ -1,20 +1,30 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>뉴스 크롤러</title>
+    <title>뉴스 요약</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
-    <h1>뉴스 크롤러</h1>
+    <h1>뉴스 검색어 요약기</h1>
     <form action="/" method="post">
-        <label for="search">검색어:</label>
-        <input type="text" id="search" name="search" required>
-        <label for="page">페이지:</label>
-        <input type="number" id="page" name="page" required>
-        <label for="page2">끝 페이지:</label>
-        <input type="number" id="page2" name="page2" required>
-        <button type="submit">검색</button>
+        <div class="form-group">
+            <label for="search">검색어:</label>
+            <input type="text" id="search" name="search" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="page">시작 페이지:</label>
+            <input type="number" id="page" name="page" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="page2">끝 페이지:</label>
+            <input type="number" id="page2" name="page2" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">검색</button>
     </form>
 </body>
+
 </html>

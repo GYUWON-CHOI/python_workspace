@@ -1,9 +1,10 @@
 import pandas as pd
-import numpy as np
+import os
+
 
 def csv_to_txt(csv_file):
     df = pd.read_csv(csv_file)
-    
+
     # Drop rows with NaN values in any of the columns
     df.dropna(subset=['date', 'title', 'link', 'content'], inplace=True)
 
@@ -16,4 +17,6 @@ def csv_to_txt(csv_file):
         txt_content += f"Date: {row['date']}\n"
         txt_content += f"Link: {row['link']}\n"
         txt_content += f"Content: {row['content']}\n\n"
+
+    os.remove(csv_file)
     return txt_content

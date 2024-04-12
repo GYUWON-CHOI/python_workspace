@@ -5,6 +5,7 @@ import datetime
 import pandas as pd
 from tqdm import tqdm
 
+
 def makePgNum(num):
     if num == 1:
         return num
@@ -13,20 +14,24 @@ def makePgNum(num):
     else:
         return num + 9 * (num - 1)
 
+
 def makeUrl(search, start_pg, end_pg):
     if start_pg == end_pg:
         start_page = makePgNum(start_pg)
-        url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(start_page)
+        url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + \
+            search + "&start=" + str(start_page)
         print("생성url: ", url)
         return url
     else:
         urls = []
         for i in range(start_pg, end_pg + 1):
             page = makePgNum(i)
-            url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(page)
+            url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + \
+                search + "&start=" + str(page)
             urls.append(url)
         print("생성url: ", urls)
         return urls
+
 
 def news_attrs_crawler(articles, attrs):
     attrs_content = []
@@ -34,21 +39,27 @@ def news_attrs_crawler(articles, attrs):
         attrs_content.append(i.attrs[attrs])
     return attrs_content
 
-headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/98.0.4758.102"}
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/98.0.4758.102"}
+
 
 def articles_crawler(url):
     original_html = requests.get(url, headers=headers)
     html = BeautifulSoup(original_html.text, "html.parser")
 
-    url_naver = html.select("div.group_news > ul.list_news > li div.news_area > div.news_info > div.info_group > a.info")
+    url_naver = html.select(
+        "div.group_news > ul.list_news > li div.news_area > div.news_info > div.info_group > a.info")
     url = news_attrs_crawler(url_naver, 'href')
     return url
+
 
 def makeList(newlist, content):
     for i in content:
         for j in i:
             newlist.append(j)
     return newlist
+
 
 def crawl_news(search, page, page2):
     url = makeUrl(search, page, page2)
@@ -75,7 +86,8 @@ def crawl_news(search, page, page2):
         news = requests.get(i, headers=headers)
         news_html = BeautifulSoup(news.text, "html.parser")
 
-        title = news_html.select_one("#ct > div.media_end_head.go_trans > div.media_end_head_title > h2")
+        title = news_html.select_one(
+            "#ct > div.media_end_head.go_trans > div.media_end_head_title > h2")
         if title is None:
             title = news_html.select_one("#content > div.end_ct > div > h2")
 
@@ -94,18 +106,23 @@ def crawl_news(search, page, page2):
         news_contents.append(content)
 
         try:
-            html_date = news_html.select_one("div#ct> div.media_end_head.go_trans > div.media_end_head_info.nv_notrans > div.media_end_head_info_datestamp > div > span")
+            html_date = news_html.select_one(
+                "div#ct> div.media_end_head.go_trans > div.media_end_head_info.nv_notrans > div.media_end_head_info_datestamp > div > span")
             news_date = html_date.attrs['data-date-time']
         except AttributeError:
-            news_date = news_html.select_one("#content > div.end_ct > div > div.article_info > span > em")
-            news_date = re.sub(pattern=pattern1, repl='', string=str(news_date))
+            news_date = news_html.select_one(
+                "#content > div.end_ct > div > div.article_info > span > em")
+            news_date = re.sub(pattern=pattern1, repl='',
+                               string=str(news_date))
 
         news_dates.append(news_date)
 
     return news_titles, final_urls, news_contents, news_dates
 
+
 def create_dataframe(news_titles, final_urls, news_contents, news_dates, search):
-    news_df = pd.DataFrame({'date': news_dates, 'title': news_titles, 'link': final_urls, 'content': news_contents})
+    news_df = pd.DataFrame({'date': news_dates, 'title': news_titles,
+                           'link': final_urls, 'content': news_contents})
     news_df = news_df.drop_duplicates(keep='first', ignore_index=True)
     now = datetime.datetime.now()
     csv_filename = '{}_{}.csv'.format(search, now.strftime('%Y%m%d_%H시%M분%S초'))

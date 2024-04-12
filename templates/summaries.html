@@ -4,12 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>검색 결과</title>
+    <title>Summaries</title>
 </head>
 
 <body>
-    <h1>검색 결과</h1>
-    {{ data|safe }}
+    <h1>Summaries</h1>
+    {% for item in summaries %}
+    <h2>{{ item['file_path'] }}</h2>
+    <p>{{ item['summary'] }}</p>
+    {% endfor %}
 </body>
 
 </html>

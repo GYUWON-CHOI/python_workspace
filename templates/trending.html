@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nate 실시간 검색어</title>
+</head>
+
+<body>
+    <h1>Nate 실시간 검색어</h1>
+    <ol>
+        {% for keyword in keywords %}
+        <li> {{ keyword.keyword }}</li>
+        {% endfor %}
+    </ol>
+</body>
+
+</html>
