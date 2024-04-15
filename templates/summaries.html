@@ -53,8 +53,8 @@
         <a href="{{ url_for('back_to_main') }}" class="btn btn-primary">메인 화면으로 돌아가기</a>
         <h1>{{ search }} 검색 결과</h1>
         {% for item in summaries %}
-        <!-- <h2>{{ item['file_path'] }}</h2> -->
         <p>{{ item['summary'] }}</p>
+        <a href="{{ item['link'] }}" class="btn btn-primary" target="_blank">원문 보기</a>
         <hr />
         {% endfor %}
     </div>
