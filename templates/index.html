@@ -56,6 +56,15 @@
                 <h1 class="title">SIMPLES</h1>
             </div>
         </div>
+        <div class="container" style="position: absolute; top: 10px; right: 10px;">
+            {% if is_logged_in %}
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">로그아웃</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-primary">로그인</a>
+            <a href="{{ url_for('register') }}" class="btn btn-secondary">회원가입</a>
+            {% endif %}
+        </div>
+
         <div class="row">
             <!-- 첫 번째 그리드 -->
             <div class="col-md-6 bordered">

@@ -1,16 +1,34 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from crawling import crawl_news, create_dataframe
 from txt_converter import csv_to_txt
 from trending import nate_crawler, list_print
 from summary import summarize_files
 from divide import split_news_from_file
+from flask_mysqldb import MySQL
+from passlib.hash import sha256_crypt
 import os
 
 app = Flask(__name__)
+# MySQL 설정
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = '1234'
+app.config['MYSQL_DB'] = 'user_info'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.secret_key = 'QWER'
+
+mysql = MySQL(app)
+
+
+def is_logged_in():
+    return 'logged_in' in session
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    if not is_logged_in():  # 로그인하지 않은 경우 로그인 페이지로 리다이렉트
+        return redirect(url_for('login'))
+
     keywords = nate_crawler()
     result = list_print(keywords)
     if request.method == 'POST':
@@ -33,7 +51,7 @@ def index():
         os.remove(txt_filename)
 
         return redirect(url_for('summaries', search=search))  # 요약 페이지로 리다이렉트
-    return render_template('index.html', keywords=result)
+    return render_template('index.html', keywords=result, is_logged_in=is_logged_in)
 
 
 @app.route('/trending')
@@ -60,6 +78,68 @@ def summaries():
 @app.route('/back_to_main')
 def back_to_main():
     return redirect(url_for('index'))  # 메인 페이지로 리다이렉트
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # 폼 데이터 가져오기
+        email = request.form['email']
+        password_candidate = request.form['password']
+
+        # MySQL에서 사용자 가져오기
+        cur = mysql.connection.cursor()
+        result = cur.execute("SELECT * FROM users WHERE email = %s", [email])
+
+        if result > 0:
+            data = cur.fetchone()
+            password = data['password']
+
+            # 비밀번호 검증
+            if sha256_crypt.verify(password_candidate, password):
+                session['logged_in'] = True
+                session['email'] = email
+                return redirect(url_for('index'))
+            else:
+                error = 'Invalid login'
+                return render_template('login.html', error=error)
+            cur.close()
+        else:
+            error = 'Email not found'
+            return render_template('login.html', error=error)
+
+    return render_template('login.html', is_logged_in=is_logged_in)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # 폼 데이터 가져오기
+        name = request.form['name']
+        email = request.form['email']
+        password = sha256_crypt.encrypt(
+            str(request.form['password']))  # 비밀번호 암호화
+
+        # MySQL에 사용자 추가
+        cur = mysql.connection.cursor()
+        cur.execute(
+            "INSERT INTO users(name, email, password) VALUES(%s, %s, %s)", (name, email, password))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))  # 로그아웃 후 로그인 페이지로 리다이렉트
+
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 
 
 if __name__ == "__main__":

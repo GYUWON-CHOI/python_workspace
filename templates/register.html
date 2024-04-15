@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            border: none;
+        }
+
+        body {
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f2f2f2;
+        }
+
+        .register-wrapper {
+            width: 400px;
+            height: auto;
+            padding: 40px;
+            box-sizing: border-box;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .register-wrapper h2 {
+            font-size: 24px;
+            color: #6A24FE;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #register-form input {
+            width: calc(100% - 20px);
+            height: 48px;
+            padding: 0 10px;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            background-color: #F8F8F8;
+            border: 1px solid #ddd;
+        }
+
+        #register-form input::placeholder {
+            color: #D2D2D2;
+        }
+
+        #register-form input[type="submit"] {
+            color: #fff;
+            font-size: 16px;
+            background-color: #6A24FE;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        #register-form input[type="submit"]:hover {
+            background-color: #4b1aaf;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="register-wrapper">
+        <h2>Register</h2>
+        <form id="register-form" method="POST" action="/register">
+            <label for="name">Name:</label><br>
+            <input type="text" id="name" name="name" required><br>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email" required><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required><br>
+            <input type="submit" value="Register">
+        </form>
+    </div>
+</body>
+
+</html>

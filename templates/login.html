@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            border: none;
+        }
+
+        body {
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f2f2f2;
+        }
+
+        .login-wrapper {
+            width: 400px;
+            height: auto;
+            padding: 40px;
+            box-sizing: border-box;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-wrapper h2 {
+            font-size: 24px;
+            color: #6A24FE;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #login-form input {
+            width: calc(100% - 20px);
+            height: 48px;
+            padding: 0 10px;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            background-color: #F8F8F8;
+            border: 1px solid #ddd;
+        }
+
+        #login-form input::placeholder {
+            color: #D2D2D2;
+        }
+
+        #login-form input[type="submit"] {
+            color: #fff;
+            font-size: 16px;
+            background-color: #6A24FE;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        #login-form input[type="submit"]:hover {
+            background-color: #4b1aaf;
+        }
+
+        p {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        a {
+            color: #6A24FE;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-wrapper">
+        <h2>Login</h2>
+        {% if error %}
+        <p>{{ error }}</p>
+        {% endif %}
+        <form id="login-form" method="POST" action="/login">
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email" required><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required><br>
+            <input type="submit" value="Login">
+        </form>
+        <p>Don't have an account? <a href="/register">Register</a></p>
+    </div>
+</body>
+
+</html>
