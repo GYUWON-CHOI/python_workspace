@@ -4,27 +4,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>뉴스 요약</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>뉴스 검색기</title>
+    <!-- Google Fonts 폰트 링크 추가 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- 제목 폰트인 'Black Han Sans' -->
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <!-- 본문 폰트인 'Noto Sans KR' -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS 링크 추가 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* CSS 스타일링 */
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f2f2f2;
+            /* 더 회색조의 배경색 */
+        }
+
+        .bordered {
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        .section-title {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>뉴스 검색어 요약기</h1>
-    <form action="/" method="post">
-        <div class="form-group">
-            <label for="search">검색어:</label>
-            <input type="text" id="search" name="search" class="form-control" required>
+    <div class="container">
+        <!-- 4개의 그리드 형식 -->
+        <div class="row">
+            <div class="col-md-12">
+                <!-- 맨 위 제목 -->
+                <h1 class="title">SIMPLES</h1>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="page">시작 페이지:</label>
-            <input type="number" id="page" name="page" class="form-control" required>
+        <div class="row">
+            <!-- 첫 번째 그리드 -->
+            <div class="col-md-6 bordered">
+                <h3 class="section-title">트렌드 키워드</h3>
+                <ul>
+                    {% for keyword in keywords %}
+                    <li style="list-style: none;">{{ loop.index }}. {{ keyword['keyword'] }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <!-- 두 번째 그리드 -->
+            <div class="col-md-6 bordered">
+                <h3 class="section-title">뉴스 검색기</h3>
+                <div class="form-container">
+                    <form action="/" method="post">
+                        <div class="form-group">
+                            <label for="search">검색어:</label>
+                            <input type="text" id="search" name="search" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="page">시작 페이지:</label>
+                            <input type="number" id="page" name="page" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="page2">끝 페이지:</label>
+                            <input type="number" id="page2" name="page2" class="form-control" required>
+                        </div>
+                        <div style=" text-align: center;">
+                            <button type="submit" class="btn btn-primary">검색</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="page2">끝 페이지:</label>
-            <input type="number" id="page2" name="page2" class="form-control" required>
+        <!-- 빈 그리드 -->
+        <div class="row">
+            <div class="col-md-6 bordered">
+                <!-- 빈 그리드 -->
+            </div>
+            <div class="col-md-6 bordered">
+                <!-- 빈 그리드 -->
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">검색</button>
-    </form>
+    </div>
+
+    <!-- Bootstrap JS 및 jQuery 추가 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

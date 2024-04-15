@@ -45,3 +45,8 @@ button[type="submit"] {
 button[type="submit"]:hover {
     background-color: #0056b3;
 }
+
+li {
+    list-style: none;
+    padding-left: 0px;
+}

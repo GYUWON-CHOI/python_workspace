@@ -3,7 +3,6 @@ import os
 
 client = OpenAI(api_key="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")
 
-
 def summarize_files(folder_path):
     file_paths = [os.path.join(folder_path, file) for file in os.listdir(
         folder_path) if file.endswith('.txt')]
@@ -16,12 +15,10 @@ def summarize_files(folder_path):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {
-                    "role": "user",
-                    "content": f"{content}를 2~3줄 분량의 핵심 문장으로 요약해줘",
-                }
+                {"role": "system", "content": "너는 뉴스를 핵심 문장으로 요약해주는 문장의 끝맺음이 확실한 훌륭한 기자이다."},
+                {"role": "user", "content": f"{content}를 요약해줘."}
             ],
-            max_tokens=150,
+            max_tokens=300,
             stream=True,
         )
 
