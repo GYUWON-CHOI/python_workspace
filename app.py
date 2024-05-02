@@ -141,6 +141,106 @@ def logout():
 def dashboard():
     return render_template('dashboard.html')
 
+@app.route('/board', methods=['GET', 'POST'])
+def board():
+    if request.method == 'POST':
+        if not is_logged_in():
+            return redirect(url_for('login'))
+        
+        title = request.form['title']
+        content = request.form['content']
+        user_email = session['email']
+
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO posts (title, content, user_email) VALUES (%s, %s, %s)", (title, content, user_email))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('board'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM posts")
+    posts = cur.fetchall()
+    cur.close()
+
+    return render_template('board.html', posts=posts, is_logged_in=is_logged_in)
+
+
+@app.route('/board/<int:post_id>', methods=['GET', 'POST'])
+def view_post(post_id):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM posts WHERE id = %s", [post_id])
+    post = cur.fetchone()
+    cur.close()
+
+    return render_template('post.html', post=post)
+
+
+@app.route('/board/<int:post_id>/edit', methods=['GET', 'POST'])
+def edit_post(post_id):
+    if not is_logged_in():
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM posts WHERE id = %s", [post_id])
+    post = cur.fetchone()
+    cur.close()
+
+    if post['user_email'] != session['email']:
+        return redirect(url_for('board'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE posts SET title = %s, content = %s WHERE id = %s", (title, content, post_id))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('board'))
+
+    return render_template('edit_post.html', post=post)
+
+
+@app.route('/board/<int:post_id>/delete', methods=['POST'])
+def delete_post(post_id):
+    if not is_logged_in():
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM posts WHERE id = %s", [post_id])
+    post = cur.fetchone()
+
+    if post['user_email'] != session['email']:
+        return redirect(url_for('board'))
+
+    cur.execute("DELETE FROM posts WHERE id = %s", [post_id])
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('board'))
+
+
+@app.route('/board/new', methods=['GET', 'POST'])
+def new_post():
+    if not is_logged_in():
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        user_email = session['email']
+
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO posts (title, content, user_email) VALUES (%s, %s, %s)", (title, content, user_email))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect(url_for('board'))
+
+    return render_template('new_post.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
