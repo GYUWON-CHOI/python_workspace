@@ -166,7 +166,8 @@ def board():
     return render_template('board.html', posts=posts, is_logged_in=is_logged_in)
 
 
-@app.route('/board/<int:post_id>', methods=['GET', 'POST'])
+
+@app.route('/board/<int:post_id>', methods=['GET'])
 def view_post(post_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM posts WHERE id = %s", [post_id])
@@ -174,8 +175,6 @@ def view_post(post_id):
     cur.close()
 
     return render_template('post.html', post=post)
-
-
 @app.route('/board/<int:post_id>/edit', methods=['GET', 'POST'])
 def edit_post(post_id):
     if not is_logged_in():
@@ -240,6 +239,76 @@ def new_post():
         return redirect(url_for('board'))
 
     return render_template('new_post.html')
+
+
+
+
+@app.route('/mypage', methods=['GET', 'POST'])
+def mypage():
+    if not is_logged_in():
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    if request.method == 'POST':
+        name = request.form['name']
+        password = request.form['password']
+        email = session['email']
+
+        # 비밀번호가 입력된 경우 암호화하여 업데이트
+        if password:
+            encrypted_password = sha256_crypt.encrypt(str(password))
+            cur.execute("UPDATE users SET name = %s, password = %s WHERE email = %s", (name, encrypted_password, email))
+        else:
+            cur.execute("UPDATE users SET name = %s WHERE email = %s", (name, email))
+
+        mysql.connection.commit()
+        cur.close()
+        return redirect(url_for('mypage'))
+
+    # 사용자 정보 가져오기
+    cur.execute("SELECT * FROM users WHERE email = %s", [session['email']])
+    user_info = cur.fetchone()
+
+    # 스크랩한 기사 가져오기
+    cur.execute("SELECT * FROM scraps WHERE user_email = %s", [session['email']])
+    scraps = cur.fetchall()
+    cur.close()
+
+    return render_template('mypage.html', user_info=user_info, scraps=scraps, is_logged_in=is_logged_in)
+
+
+@app.route('/scrap', methods=['POST'])
+def scrap():
+    if not is_logged_in():
+        return redirect(url_for('login'))
+
+    title = request.form['title']
+    url = request.form['url']
+    content = request.form['content']
+    date = request.form['date']
+    user_email = session['email']
+
+    cur = mysql.connection.cursor()
+    cur.execute("INSERT INTO scraps (user_email, title, url, content, date) VALUES (%s, %s, %s, %s, %s)", (user_email, title, url, content, date))
+    mysql.connection.commit()
+    cur.close()
+
+    return jsonify({'success': True})
+
+@app.route('/scrap/delete/<int:scrap_id>', methods=['POST'])
+def delete_scrap(scrap_id):
+    if not is_logged_in():
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM scraps WHERE id = %s AND user_email = %s", (scrap_id, session['email']))
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('mypage'))
+
+
+
 
 
 if __name__ == "__main__":

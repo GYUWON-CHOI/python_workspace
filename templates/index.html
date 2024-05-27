@@ -48,65 +48,88 @@
 </head>
 
 <body>
-    <div class="container">
-        <!-- 4개의 그리드 형식 -->
-        <div class="row">
-            <div class="col-md-12">
-                <!-- 맨 위 제목 -->
-                <h1 class="title">SIMPLES</h1>
-            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="title">SIMPLES</h1>
         </div>
-        <div class="container" style="position: absolute; top: 10px; right: 10px;">
-            {% if is_logged_in %}
-            <a href="{{ url_for('logout') }}" class="btn btn-danger">로그아웃</a>
-            {% else %}
-            <a href="{{ url_for('login') }}" class="btn btn-primary">로그인</a>
-            <a href="{{ url_for('register') }}" class="btn btn-secondary">회원가입</a>
-            {% endif %}
-        </div>
+    </div>
+    <div class="container" style="position: absolute; top: 10px; right: 10px;">
+        {% if is_logged_in %}
+        <a href="{{ url_for('mypage') }}" class="btn btn-info">마이페이지</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-danger">로그아웃</a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-primary">로그인</a>
+        <a href="{{ url_for('register') }}" class="btn btn-secondary">회원가입</a>
+        {% endif %}
+    </div>
 
-        <div class="row">
-            <!-- 첫 번째 그리드 -->
-            <div class="col-md-6 bordered">
-                <h3 class="section-title">트렌드 키워드</h3>
-                <ul>
-                    {% for keyword in keywords %}
-                    <li style="list-style: none;">{{ loop.index }}. {{ keyword['keyword'] }}</li>
-                    {% endfor %}
-                </ul>
+    <div class="row">
+        <!-- 첫 번째 그리드 -->
+        <div class="col-md-6 bordered">
+            <h3 class="section-title">트렌드 키워드</h3>
+            <ul>
+                {% for keyword in keywords %}
+                <li style="list-style: none;">{{ loop.index }}. {{ keyword['keyword'] }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- 두 번째 그리드 -->
+        <div class="col-md-6 bordered">
+            <h3 class="section-title">뉴스 검색기</h3>
+            <div class="form-container">
+                <form action="/" method="post">
+                    <div class="form-group">
+                        <label for="search">검색어:</label>
+                        <input type="text" id="search" name="search" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="page">시작 페이지:</label>
+                        <input type="number" id="page" name="page" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="page2">끝 페이지:</label>
+                        <input type="number" id="page2" name="page2" class="form-control" required>
+                    </div>
+                    <div style=" text-align: center;">
+                        <button type="submit" class="btn btn-primary">검색</button>
+                    </div>
+                </form>
             </div>
-            <!-- 두 번째 그리드 -->
-            <div class="col-md-6 bordered">
-                <h3 class="section-title">뉴스 검색기</h3>
-                <div class="form-container">
-                    <form action="/" method="post">
-                        <div class="form-group">
-                            <label for="search">검색어:</label>
-                            <input type="text" id="search" name="search" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="page">시작 페이지:</label>
-                            <input type="number" id="page" name="page" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="page2">끝 페이지:</label>
-                            <input type="number" id="page2" name="page2" class="form-control" required>
-                        </div>
-                        <div style=" text-align: center;">
-                            <button type="submit" class="btn btn-primary">검색</button>
-                        </div>
-                    </form>
+        </div>
+    </div>
+    <!-- 빈 그리드 -->
+    <div class="row">
+        <div class="col-md-6 bordered">
+            <!-- 빈 그리드 -->
+        </div>
+        <!-- 네 번째 그리드 -->
+        <div class="col-md-6 bordered">
+            <!-- 여기에 게시판의 내용이 표시됩니다 -->
+            <div class="container">
+                <!-- 보드 페이지로 이동하는 버튼 -->
+                <div style="position: absolute; top: 10px; left: 10px;">
+                    <a href="{{ url_for('board') }}" class="btn btn-info">게시판</a>
                 </div>
             </div>
-        </div>
-        <!-- 빈 그리드 -->
-        <div class="row">
-            <div class="col-md-6 bordered">
-                <!-- 빈 그리드 -->
+            <div style="margin-top: 60px;">
+                {% if is_logged_in %}
+                <a href="{{ url_for('new_post') }}">새 글 쓰기</a>
+                {% else %}
+                <a href="{{ url_for('login') }}">로그인</a>
+                {% endif %}
             </div>
-            <div class="col-md-6 bordered">
-                <!-- 빈 그리드 -->
+            <hr>
+
+            <h2>게시물</h2>
+
+            {% for post in posts %}
+            <div class="post">
+                <h3 style="border-bottom: 1px solid #0c62ed;"><a href="{{ url_for('view_post', post_id=post.id) }}">TITLE: {{ post.title }}</a></h3>
+                <p>Author: {{ post.user_email }}</p>
+                <p>Created at: {{ post.created_at }}</p>
             </div>
+            <hr>
+            {% endfor %}
         </div>
     </div>
 

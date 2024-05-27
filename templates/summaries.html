@@ -7,6 +7,8 @@
     <title>Summaries</title>
     <!-- Bootstrap CSS 링크 추가 -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome 라이브러리 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,6 +47,23 @@
             margin-bottom: 20px;
             color: #333333;
         }
+
+        .read-button,
+        .stop-button {
+        padding: 0; /* 기본 패딩 제거 */
+        background-color: #ffffff;
+        border: none; /* 외곽선 제거 */
+        box-shadow: none; /* 그림자 제거 */
+}
+
+        .read-button i,
+        .stop-button i {
+        line-height: 38px; /* 아이콘 세로 중앙 정렬 */
+        border: none; /* 외곽선 제거 */
+        background-color: #ffffff;
+}
+
+
     </style>
 </head>
 
@@ -54,7 +73,15 @@
         <h1>{{ search }} 검색 결과</h1>
         {% for item in summaries %}
         <p>{{ item['summary'] }}</p>
-        <a href="{{ item['link'] }}" class="btn btn-primary" target="_blank">원문 보기</a>
+        <div class="d-flex align-items-center">
+            </button>
+            <a href="{{ item['link'] }}" class="btn btn-primary mr-2" target="_blank">원문 보기</a>
+            <button class="read-button btn btn-secondary mr-2" data-summary="{{ item['summary'] }}" data-rate="{{ item['rate'] }}">
+                <i class="fas fa-circle-play fa-2x" style="color: #000000;"></i> <!-- Font Awesome 아이콘 사용 -->
+            <button class="stop-button btn btn-danger">
+                <i class="fas fa-stop fa-2x" style="color: #ffffff;"></i> <!-- Font Awesome 아이콘 사용 -->
+            </button>
+        </div>
         <hr />
         {% endfor %}
     </div>
@@ -63,6 +90,35 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- TTS JavaScript 코드 추가 -->
+    <script>
+        let isPlaying = false;
+        let utterance = new SpeechSynthesisUtterance();
+        utterance.lang = 'ko-KR';
+
+        document.querySelectorAll('.read-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var summary = this.getAttribute('data-summary');
+                var rate = parseFloat(this.getAttribute('data-rate')) || 2; // 읽는 속도 설정
+                if (!isPlaying) {
+                    utterance.text = summary;
+                    utterance.rate = rate;
+                    speechSynthesis.speak(utterance);
+                    isPlaying = true;
+                    button.innerHTML = '<i class="fas fa-stop fa-2x" style="color:#000000;"></i>'; // 버튼 내용 변경
+                    // 음성 재생이 끝나면 재생 버튼으로 변경
+                    utterance.onend = function() {
+                        button.innerHTML = '<i class="fas fa-circle-play fa-2x" style="color: #000000;"></i>';
+                        isPlaying = false;
+                    };
+                } else {
+                    speechSynthesis.cancel();
+                    isPlaying = false;
+                    button.innerHTML = '<i class="fas fa-circle-play fa-2x" style="color: #000000;"></i>'; // 버튼 내용 변경
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
