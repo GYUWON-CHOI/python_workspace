@@ -50,20 +50,18 @@
 
         .read-button,
         .stop-button {
-        padding: 0; /* 기본 패딩 제거 */
-        background-color: #ffffff;
-        border: none; /* 외곽선 제거 */
-        box-shadow: none; /* 그림자 제거 */
-}
+            padding: 0; /* 기본 패딩 제거 */
+            background-color: #ffffff;
+            border: none; /* 외곽선 제거 */
+            box-shadow: none; /* 그림자 제거 */
+        }
 
         .read-button i,
         .stop-button i {
-        line-height: 38px; /* 아이콘 세로 중앙 정렬 */
-        border: none; /* 외곽선 제거 */
-        background-color: #ffffff;
-}
-
-
+            line-height: 38px; /* 아이콘 세로 중앙 정렬 */
+            border: none; /* 외곽선 제거 */
+            background-color: #ffffff;
+        }
     </style>
 </head>
 
@@ -72,12 +70,13 @@
         <a href="{{ url_for('back_to_main') }}" class="btn btn-primary">메인 화면으로 돌아가기</a>
         <h1>{{ search }} 검색 결과</h1>
         {% for item in summaries %}
+        <h2>{{ item['title'] }}</h2> <!-- 타이틀 표시 -->
         <p>{{ item['summary'] }}</p>
         <div class="d-flex align-items-center">
-            </button>
             <a href="{{ item['link'] }}" class="btn btn-primary mr-2" target="_blank">원문 보기</a>
             <button class="read-button btn btn-secondary mr-2" data-summary="{{ item['summary'] }}" data-rate="{{ item['rate'] }}">
                 <i class="fas fa-circle-play fa-2x" style="color: #000000;"></i> <!-- Font Awesome 아이콘 사용 -->
+            </button>
             <button class="stop-button btn btn-danger">
                 <i class="fas fa-stop fa-2x" style="color: #ffffff;"></i> <!-- Font Awesome 아이콘 사용 -->
             </button>

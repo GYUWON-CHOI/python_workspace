@@ -1,33 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Page</title>
-</head>
-<body>
-    <h1>My Page</h1>
-    <h2>회원 정보 수정</h2>
-    <form method="POST" action="{{ url_for('mypage') }}">
-        <label for="name">이름:</label>
-        <input type="text" id="name" name="name" value="{{ user_info['name'] }}" required><br>
-        <label for="password">비밀번호 (변경 시 입력):</label>
-        <input type="password" id="password" name="password"><br>
-        <button type="submit">수정</button>
-    </form>
+    <!-- Google Fonts 폰트 링크 추가 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS 링크 추가 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+        }
 
-    <h2>스크랩한 기사</h2>
-    <ul>
-        {% for scrap in scraps %}
-        <li>
-            <h3>{{ scrap['title'] }}</h3>
-            <p>{{ scrap['content'] }}</p>
-            <a href="{{ scrap['url'] }}" target="_blank">기사 보기</a>
-            <form method="POST" action="{{ url_for('delete_scrap', scrap_id=scrap['id']) }}">
-                <button type="submit">삭제</button>
-            </form>
-        </li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('index') }}">메인 화면으로 돌아가기</a>
+        .container {
+            margin-top: 50px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .scrap-list li {
+            list-style: none;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+
+        .scrap-list h3 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .scrap-list p {
+            font-size: 1rem;
+        }
+
+        .btn-back {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>My Page</h1>
+        <h2>회원 정보 수정</h2>
+        <form method="POST" action="{{ url_for('mypage') }}">
+            <div class="form-group">
+                <label for="name">이름:</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ user_info['name'] }}" required>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호 (변경 시 입력):</label>
+                <input type="password" id="password" name="password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">수정</button>
+        </form>
+
+        <h2>스크랩한 기사</h2>
+        <ul class="scrap-list">
+            {% for scrap in scraps %}
+            <li>
+                <h3>{{ scrap['title'] }}</h3>
+                <p>{{ scrap['content'] }}</p>
+                <a href="{{ scrap['url'] }}" target="_blank" class="btn btn-link">기사 보기</a>
+                <form method="POST" action="{{ url_for('delete_scrap', scrap_id=scrap['id']) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary btn-back">메인 화면으로 돌아가기</a>
+    </div>
+
+    <!-- Bootstrap JS 및 jQuery 추가 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>
