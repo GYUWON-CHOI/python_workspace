@@ -6,9 +6,14 @@ from summary import summarize_files
 from divide import split_news_from_file
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
+from datetime import datetime
+from weather import get_weather_data
 import os
+import requests
 
 app = Flask(__name__)
+api_key = '0dbafd19fb31e198e2ed51d414bde931'
+
 # MySQL 설정
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -28,9 +33,32 @@ def is_logged_in():
 def index():
     if not is_logged_in():  # 로그인하지 않은 경우 로그인 페이지로 리다이렉트
         return redirect(url_for('login'))
+    
+    # 초기화
+    weather_data = None
+    error_message = None
+
+    # 서울 날씨 정보 가져오기
+    city = "Seoul"
+    weather_data = get_weather_data(city, api_key)
+    if weather_data['cod'] != 200:
+        error_message = "도시를 찾을 수 없습니다."
+        weather_data = None
+    else:
+        city_name = weather_data['name']
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        weather = weather_data['weather'][0]['description']
+        feels_like = weather_data['main']['feels_like']
+        temp_min = weather_data['main']['temp_min']
+        temp_max = weather_data['main']['temp_max']
+        icon = weather_data['weather'][0]['icon']
+
+    # 최대 3개의 게시물 가져오기
+    posts = get_posts()[:4]
 
     keywords = nate_crawler()
     result = list_print(keywords)
+    
     if request.method == 'POST':
         search = request.form['search']
         page = int(request.form['page'])
@@ -51,7 +79,19 @@ def index():
         os.remove(txt_filename)
 
         return redirect(url_for('summaries', search=search))  # 요약 페이지로 리다이렉트
-    return render_template('index.html', keywords=result, is_logged_in=is_logged_in)
+
+    return render_template('index.html', posts=posts, keywords=result, is_logged_in=is_logged_in, city_name=city_name, current_time=current_time,
+                           weather=weather, feels_like=feels_like, temp_min=temp_min,
+                           temp_max=temp_max, icon=icon, error_message=error_message)
+
+
+# MySQL에서 게시물 데이터 가져오기
+def get_posts():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM posts")
+    posts = cur.fetchall()
+    cur.close()
+    return posts
 
 
 @app.route('/trending')
@@ -64,7 +104,7 @@ def trending():
 @app.route('/summaries')
 def summaries():
     search = request.args.get('search')
-    folder_path = 'C:\python_workspace'
+    folder_path = 'C:\\python_workspace'  # 경로 수정
     summaries = summarize_files(folder_path)
 
     # 요약 후에 txt 파일 삭제
@@ -72,7 +112,7 @@ def summaries():
         txt_filename = summary['file_path']
         os.remove(txt_filename)
 
-    return render_template('summaries.html', summaries=summaries, search=search)
+    return render_template('summaries.html', summaries=summaries, search=search, is_logged_in=is_logged_in)
 
 
 @app.route('/back_to_main')
@@ -141,12 +181,13 @@ def logout():
 def dashboard():
     return render_template('dashboard.html')
 
+
 @app.route('/board', methods=['GET', 'POST'])
 def board():
     if request.method == 'POST':
         if not is_logged_in():
             return redirect(url_for('login'))
-        
+
         title = request.form['title']
         content = request.form['content']
         user_email = session['email']
@@ -166,7 +207,6 @@ def board():
     return render_template('board.html', posts=posts, is_logged_in=is_logged_in)
 
 
-
 @app.route('/board/<int:post_id>', methods=['GET'])
 def view_post(post_id):
     cur = mysql.connection.cursor()
@@ -175,6 +215,8 @@ def view_post(post_id):
     cur.close()
 
     return render_template('post.html', post=post)
+
+
 @app.route('/board/<int:post_id>/edit', methods=['GET', 'POST'])
 def edit_post(post_id):
     if not is_logged_in():
@@ -201,7 +243,6 @@ def edit_post(post_id):
 
     return render_template('edit_post.html', post=post)
 
-
 @app.route('/board/<int:post_id>/delete', methods=['POST'])
 def delete_post(post_id):
     if not is_logged_in():
@@ -210,7 +251,6 @@ def delete_post(post_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM posts WHERE id = %s", [post_id])
     post = cur.fetchone()
-
     if post['user_email'] != session['email']:
         return redirect(url_for('board'))
 
@@ -239,8 +279,6 @@ def new_post():
         return redirect(url_for('board'))
 
     return render_template('new_post.html')
-
-
 
 
 @app.route('/mypage', methods=['GET', 'POST'])
@@ -277,38 +315,36 @@ def mypage():
     return render_template('mypage.html', user_info=user_info, scraps=scraps, is_logged_in=is_logged_in)
 
 
-@app.route('/scrap', methods=['POST'])
-def scrap():
+users = {
+    'user1': {
+        'email': 'user1@example.com',
+        'password': sha256_crypt.encrypt('password1'),
+        'bookmarks': []
+    }
+    # 필요에 따라 추가 사용자 정의 가능
+}
+
+# scrap Blueprint 등록
+from scrap import scrap_bp
+app.register_blueprint(scrap_bp)
+
+@app.route('/bookmark', methods=['POST'])
+def bookmark():
+    print("Bookmark route accessed")  # 디버그 출력
     if not is_logged_in():
-        return redirect(url_for('login'))
+        return jsonify({'status': 'fail', 'reason': 'not_logged_in'})
 
-    title = request.form['title']
-    url = request.form['url']
-    content = request.form['content']
-    date = request.form['date']
-    user_email = session['email']
+    data = request.json
+    if not data or not 'title' in data or not 'link' in data:
+        return jsonify({'status': 'fail', 'reason': 'invalid_data'})
 
+    # MySQL scraps 테이블에 즐겨찾기 정보 저장
     cur = mysql.connection.cursor()
-    cur.execute("INSERT INTO scraps (user_email, title, url, content, date) VALUES (%s, %s, %s, %s, %s)", (user_email, title, url, content, date))
+    cur.execute("INSERT INTO scraps (user_email, title, url) VALUES (%s, %s, %s)", (session['email'], data['title'], data['link']))
     mysql.connection.commit()
     cur.close()
 
-    return jsonify({'success': True})
-
-@app.route('/scrap/delete/<int:scrap_id>', methods=['POST'])
-def delete_scrap(scrap_id):
-    if not is_logged_in():
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM scraps WHERE id = %s AND user_email = %s", (scrap_id, session['email']))
-    mysql.connection.commit()
-    cur.close()
-
-    return redirect(url_for('mypage'))
-
-
-
+    return jsonify({'status': 'success'})
 
 
 if __name__ == "__main__":

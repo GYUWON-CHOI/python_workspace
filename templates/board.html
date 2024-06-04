@@ -1,109 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Board</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
         }
-        h1 {
-            text-align: center;
-            margin-top: 20px;
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding-top: 70px;
         }
-        h2 {
-            margin-top: 30px;
-        }
-        a {
-            text-decoration: none;
-            color: #333;
-            margin-right: 10px;
-        }
-        a:hover {
-            color: rgb(68, 136, 244);
-        }
-        hr {
-            border: 1px solid #0c62ed;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        .post {
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
             background-color: white;
-            border-radius: 5px;
-            padding: 15px;
             margin-bottom: 20px;
         }
-        .post h3 {
-            margin-top: 0;
+
+        table th {
+            padding: 14px 21px;
+            background: #ececec;
+            color: #666;
+            font-size: 12px;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #ddd;
         }
-        .post p {
-            margin-bottom: 10px;
+
+        table td {
+            padding: 14px 21px;
+            color: #666;
+            font-size: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
         }
-        .post .actions {
-            margin-top: 10px;
-        }
-        .post .actions a {
-            margin-right: 10px;
-            color: #333;
-            padding: 5px 10px;
-            border: 1px solid #0c62ed;
-            border-radius: 3px;
-            background-color: rgb(164, 199, 255);
+
+        table tr:hover {
+            background: #eee;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
-        .post .actions a:hover {
-            color: rgb(68, 136, 244);
-            background-color: rgb(68, 136, 244);
+
+        .subject {
+            text-align: left;
         }
-        .post .actions form {
-            display: inline;
+
+        .paging {
+            padding: 20px 0;
         }
-        .post .actions button {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 3px;
-            background-color: rgb(164, 199, 255);
-            color: white;
+
+        .paging>ul {
+            display: flex;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .paging>ul>li {
+            padding: 8px;
+            background: #efefef;
+            border: 1px solid #999;
+            font-size: 12px;
+            margin-left: 10px;
+            list-style: none;
+        }
+
+        .paging>ul>li:hover {
             cursor: pointer;
-            transition: background-color 0.3s;
+            background: #333;
+            color: #fff;
         }
-        .post .actions button:hover {
-            background-color: rgb(68, 136, 244);
+
+        .active {
+            background: #333 !important;
+            color: #fff;
         }
     </style>
 </head>
+
 <body>
-    <h1>Board</h1>
 
-    {% if is_logged_in %}
-    <a href="{{ url_for('logout') }}">Logout</a>
-    <a href="{{ url_for('new_post') }}">New Post</a>
-    {% else %}
-    <a href="{{ url_for('login') }}">Login</a>
-    {% endif %}
+    <!-- 네비게이션 바 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">포털사이트</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if is_logged_in %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('board') }}">게시판</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('mypage') }}">마이페이지</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">로그아웃</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">로그인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">회원가입</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <hr>
+    <div class="container">
+        <h1 class="text-center mb-4">Board</h1>
 
-    <h2>Posts</h2>
-
-    {% for post in posts %}
-    <div class="post">
-        <h3 style="border-bottom: 1px solid #0c62ed;"><a href="{{ url_for('view_post', post_id=post.id) }}">TITLE: {{ post.title }}</a></h3>
-        <p>Author: {{ post.user_email }}</p>
-        <p>Created at: {{ post.created_at }}</p>
-        <div class="actions">
-            {% if is_logged_in and post.user_email == session['email'] %}
-            <a href="{{ url_for('edit_post', post_id=post.id) }}">Edit</a>
-            <form action="{{ url_for('delete_post', post_id=post.id) }}" method="post">
-                <button type="submit">Delete</button>
-            </form>
+        <div class="d-flex justify-content-end mb-3">
+            {% if is_logged_in %}
+            <a href="{{ url_for('logout') }}" class="btn btn-secondary me-2">Logout</a>
+            <a href="{{ url_for('new_post') }}" class="btn btn-primary">New Post</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
             {% endif %}
         </div>
+
+        <h2>Posts</h2>
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>작성일</th>
+                    <th>조회수</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td class="subject"><a href="{{ url_for('view_post', post_id=post.id) }}">{{ post.title }}</a></td>
+                    <td>{{ post.user_email }}</td>
+                    <td>{{ post.created_at }}</td>
+                    <td>{{ post.views }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="paging">
+            <ul>
+                <li>prev</li>
+                <li class="active">1</li>
+                <li>2</li>
+                <li>3</li>
+                <li>4</li>
+                <li>5</li>
+                <li>next</li>
+            </ul>
+        </div>
     </div>
-    <hr>
-    {% endfor %}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 </body>
+
 </html>

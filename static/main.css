@@ -1,0 +1,120 @@
+/* main.css */
+
+/* Body */
+body.is-preload * {
+    transition: none !important;
+}
+
+/* Header */
+#header {
+    background-color: #222;
+    color: #fff;
+}
+
+#header .logo {
+    font-size: 1.5em;
+}
+
+#header nav a {
+    color: #fff;
+}
+
+/* Menu */
+#menu {
+    background-color: #333;
+}
+
+#menu .links a {
+    color: #fff;
+}
+
+/* Banner */
+#banner.major {
+    background: #333 url('images/banner.jpg') no-repeat center center;
+    background-size: cover;
+    color: #fff;
+    text-align: center;
+}
+
+#banner.major .inner {
+    padding: 4em 2em;
+}
+
+#banner.major .content p {
+    color: #ddd;
+}
+
+#banner.major .actions .button {
+    background: #e44c65;
+    color: #fff;
+}
+
+/* Main */
+#main {
+    padding: 4em 0;
+}
+
+#main .tiles article {
+    background-color: #444;
+    color: #fff;
+}
+
+#main .tiles article .image img {
+    opacity: 0.85;
+}
+
+#main .tiles article header.major h3 {
+    color: #fff;
+}
+
+#main .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#main .fields .field {
+    margin-bottom: 1em;
+}
+
+#main .fields .field label {
+    color: #333;
+}
+
+/* Footer */
+#footer {
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 2em 0;
+}
+
+#footer .icons a {
+    color: #fff;
+}
+
+#footer .icons a:hover {
+    color: #e44c65;
+}
+
+#footer .copyright {
+    margin-top: 1em;
+    color: #aaa;
+}
+
+/* Actions */
+.actions .button {
+    background: #e44c65;
+    color: #fff;
+}
+
+.actions .button.primary {
+    background: #e44c65;
+}
+
+.actions .button:hover {
+    background: #f66;
+}
+
+.actions .button.primary:hover {
+    background: #f66;
+}
