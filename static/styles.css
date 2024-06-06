@@ -6,9 +6,10 @@
 }
 
 body {
-    font-family: 'Pretendard-Regular', Arial, sans-serif;
+    font-family: 'Pretendard-Regular', 'Pretendard-Regular', Arial, sans-serif;
     background-color: #f8f9fa;
-    margin-top: 56px; /* 네비게이션 바 높이 보정 */
+    margin-top: 56px;
+    /* 네비게이션 바 높이 보정 */
 }
 
 .bordered {
@@ -18,7 +19,7 @@ body {
 }
 
 .title {
-    font-family: 'Black Han Sans', sans-serif;
+    font-family: 'Pretendard-Regular', sans-serif;
     font-size: 36px;
     font-weight: bold;
     margin-bottom: 20px;
@@ -27,7 +28,7 @@ body {
 }
 
 .section-title {
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'Pretendard-Regular', sans-serif;
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
@@ -39,7 +40,8 @@ body {
     padding-top: 20px;
 }
 
-.form-control, .btn {
+.form-control,
+.btn {
     height: 100%;
 }
 
@@ -53,11 +55,13 @@ body {
     border-radius: 5px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px; /* 게시물 사이의 간격 */
+    margin-bottom: 20px;
+    /* 게시물 사이의 간격 */
 }
 
 .card-body h5 {
-    font-size: 1.25rem; /* 폰트 크기 조정 */
+    font-size: 1.25rem;
+    /* 폰트 크기 조정 */
     margin: 0 0 10px 0;
 }
 
@@ -71,7 +75,8 @@ body {
 }
 
 .card p {
-    font-size: 1rem; /* 폰트 크기 조정 */
+    font-size: 1rem;
+    /* 폰트 크기 조정 */
     color: #6c757d;
     margin: 0;
 }
@@ -85,22 +90,75 @@ body {
 }
 
 .list-group-item {
-    font-size: 1rem; /* 폰트 크기 조정 */
+    font-size: 1rem;
+    /* 폰트 크기 조정 */
 }
 
 .navbar-nav .nav-link {
-    font-size: 1rem; /* 네비게이션 폰트 크기 */
+    font-size: 1rem;
+    /* 네비게이션 폰트 크기 */
 }
 
 .form-control {
-    font-size: 1rem; /* 검색 폼 폰트 크기 */
+    font-size: 1rem;
+    /* 검색 폰트 크기 */
 }
 
 .btn-primary {
-    font-size: 1rem; /* 버튼 폰트 크기 */
+    font-size: 1rem;
+    /* 버튼 폰트 크기 */
 }
 
 /* 입력창 높이 조정 */
-#search, #page, #page2 {
-    height: calc(2.75rem + 2px); /* 입력창 높이 증가 */
+#search,
+#page,
+#page2 {
+    height: calc(2.75rem + 2px);
+    /* 입력창 높이 증가 */
+}
+
+.container {
+    margin-top: 70px;
+}
+
+h1,
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.scrap-list li,
+.bookmark-list li {
+    list-style: none;
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #ffffff;
+}
+
+.scrap-list h3,
+.bookmark-list h3 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.scrap-list p,
+.bookmark-list p {
+    font-size: 1rem;
+}
+
+.btn-back {
+    display: block;
+    width: fit-content;
+    margin: 20px auto;
+}
+
+.navbar-brand,
+.navbar-nav .nav-link {
+    font-weight: bold;
 }

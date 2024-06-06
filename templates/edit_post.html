@@ -1,56 +1,66 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>글쓰기</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f2f2f2;
-    }
-    form {
-        margin: auto;
-        width: 50%;
-        padding: 20px;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
-    }
-    h2 {
-        margin-top: 0;
-    }
-    input[type="text"], textarea {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        margin-bottom: 10px;
-        box-sizing: border-box;
-    }
-    input[type="submit"] {
-        width: 100%;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        background-color: rgb(164, 199, 255);
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    input[type="submit"]:hover {
-        background-color: rgb(68, 136, 244);
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>글쓰기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        form {
+            margin: auto;
+            width: 50%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgb(164, 199, 255);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: rgb(68, 136, 244);
+        }
+    </style>
 </head>
+
 <body>
-<form action="" method="post">
-    <h2>글쓰기</h2>
-    <label for="title">Title:</label><br>
-    <input type="text" placeholder="제목을 입력하세요" name="title" value="{{ post.title }}"><br>
-    <label for="content">Content:</label><br>
-    <textarea placeholder="내용을 입력하세요" name="content">{{ post.content }}</textarea><br>
-    <input type="submit" value="저장">
-</form>
+    {% include 'navbar.html' %}
+    <form action="" method="post">
+        <h2>글쓰기</h2>
+        <label for="title">Title:</label><br>
+        <input type="text" placeholder="제목을 입력하세요" name="title" value="{{ post.title }}"><br>
+        <label for="content">Content:</label><br>
+        <textarea placeholder="내용을 입력하세요" name="content">{{ post.content }}</textarea><br>
+        <input type="submit" value="저장">
+    </form>
 </body>
+
 </html>

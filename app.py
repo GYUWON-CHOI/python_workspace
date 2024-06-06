@@ -184,6 +184,9 @@ def dashboard():
 
 @app.route('/board', methods=['GET', 'POST'])
 def board():
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+
     if request.method == 'POST':
         if not is_logged_in():
             return redirect(url_for('login'))
@@ -204,7 +207,15 @@ def board():
     posts = cur.fetchall()
     cur.close()
 
-    return render_template('board.html', posts=posts, is_logged_in=is_logged_in)
+    total_posts = len(posts)
+    total_pages = (total_posts + per_page - 1) // per_page
+
+    start_idx = (page - 1) * per_page
+    end_idx = min(start_idx + per_page, total_posts)
+    posts_to_display = posts[start_idx:end_idx]
+
+    return render_template('board.html', posts=posts_to_display, is_logged_in=is_logged_in, total_pages=total_pages, current_page=page)
+
 
 
 @app.route('/board/<int:post_id>', methods=['GET'])
@@ -346,6 +357,6 @@ def bookmark():
 
     return jsonify({'status': 'success'})
 
-
+# flask --debug run
 if __name__ == "__main__":
     app.run(debug=True)
