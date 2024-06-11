@@ -1,61 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ post.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Styles from the first HTML file */
         body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
-            text-align: center; /* Center the content */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
 
-        /* Custom styles */
-        .info-table {
-            border-collapse: collapse;
-            width: 300px;
-            text-align: left;
-            margin-top: 20px;
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding-top: 70px;
         }
-        .info-table th,
-        .info-table td {
-            border: 3px solid #000000;
-            padding: 8px;
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
         }
-        .info-table th {
-            background-color: #0c62ed;
-            color: white;
-            text-align: center; /* Center the content in header cells */
+
+        .post-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .post-meta {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .post-content {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #333;
+            min-height:500px; /* 화면 높이의 3/2 */
+        }
+
+        .comments-section {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .comment {
+            margin-bottom: 15px;
+        }
+
+        .comment .comment-meta {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .comment .comment-content {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .navbar {
+            margin-bottom: 20px;
         }
     </style>
 </head>
+
 <body>
-    {% include 'navbar.html' %}
-    <table class="info-table">
-        <tr>
-            <th>제목</th>
-            <td>{{ post.title }}</td>
-        </tr>
-        <tr>
-            <th>내용</th>
-            <td>{{ post.content }}</td>
-        </tr>
-        <tr>
-            <th>작성자</th>
-            <td>{{ post.user_email }}</td>
-        </tr>
-        <tr>
-            <th>생성날짜</th>
-            <td>{{ post.created_at }}</td>
-        </tr>
-    </table>
+    <!-- 네비게이션 바 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">포털사이트</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if is_logged_in %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('board') }}">게시판</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('mypage') }}">마이페이지</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">로그아웃</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">로그인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">회원가입</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="post-header">
+            <div class="post-title">{{ post.title }}</div>
+            <div class="post-meta">{{ post.created_at }} | {{ post.user_email }}</div>
+        </div>
+        
+        <div class="post-content">
+            {{ post.content }}
+        </div>
+
+        <div class="comments-section">
+            <h5>댓글</h5>
+            {% for comment in comments %}
+            <div class="comment">
+                <div class="comment-meta">{{ comment.user_email }} | {{ comment.created_at }}</div>
+                <div class="comment-content">{{ comment.content }}</div>
+                {% if comment.user_email == session['email'] %}
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#editCommentModal{{ comment.id }}">수정</button>
+                    <form action="{{ url_for('delete_comment', post_id=post.id, comment_id=comment.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-link btn-sm">삭제</button>
+                    </form>
+                </div>
+
+                <!-- Edit Comment Modal -->
+                <div class="modal fade" id="editCommentModal{{ comment.id }}" tabindex="-1" aria-labelledby="editCommentModalLabel{{ comment.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editCommentModalLabel{{ comment.id }}">댓글 수정</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{{ url_for('edit_comment', post_id=post.id, comment_id=comment.id) }}" method="POST">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="content{{ comment.id }}" class="form-label">댓글 내용</label>
+                                        <textarea class="form-control" id="content{{ comment.id }}" name="content" rows="3" required>{{ comment.content }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                                    <button type="submit" class="btn btn-primary">저장</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            {% if is_logged_in %}
+            <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="content" class="form-label">댓글 작성</label>
+                    <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">댓글 추가</button>
+            </form>
+            {% else %}
+            <p>댓글을 작성하려면 <a href="{{ url_for('login') }}">로그인</a>하세요.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% include 'footer.html' %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 </body>
+
 </html>

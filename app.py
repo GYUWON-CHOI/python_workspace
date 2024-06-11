@@ -104,7 +104,7 @@ def trending():
 @app.route('/summaries')
 def summaries():
     search = request.args.get('search')
-    folder_path = 'C:\\python_workspace'  # 경로 수정
+    folder_path = 'C:\python_workspace-main'  # 경로 수정
     summaries = summarize_files(folder_path)
 
     # 요약 후에 txt 파일 삭제
@@ -218,15 +218,39 @@ def board():
 
 
 
-@app.route('/board/<int:post_id>', methods=['GET'])
+@app.route('/board/<int:post_id>', methods=['GET', 'POST'])
 def view_post(post_id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM posts WHERE id = %s", [post_id])
     post = cur.fetchone()
+
+    comments = get_comments(post_id)
     cur.close()
 
-    return render_template('post.html', post=post)
+    return render_template('post.html', post=post, comments=comments, is_logged_in=is_logged_in)
+# 댓글 저장
+@app.route('/board/<int:post_id>/comment', methods=['POST'])
+def add_comment(post_id):
+    if not is_logged_in():
+        return redirect(url_for('login'))
 
+    content = request.form['content']
+    user_email = session['email']
+
+    cur = mysql.connection.cursor()
+    cur.execute("INSERT INTO comments (post_id, user_email, content) VALUES (%s, %s, %s)", (post_id, user_email, content))
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('view_post', post_id=post_id))
+
+# 댓글 가져오기
+def get_comments(post_id):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM comments WHERE post_id = %s ORDER BY created_at DESC", [post_id])
+    comments = cur.fetchall()
+    cur.close()
+    return comments
 
 @app.route('/board/<int:post_id>/edit', methods=['GET', 'POST'])
 def edit_post(post_id):
@@ -253,6 +277,49 @@ def edit_post(post_id):
         return redirect(url_for('board'))
 
     return render_template('edit_post.html', post=post)
+
+# 댓글 수정
+@app.route('/board/<int:post_id>/comment/<int:comment_id>/edit', methods=['POST'])
+def edit_comment(post_id, comment_id):
+    if not is_logged_in():
+        return redirect(url_for('login'))
+
+    content = request.form['content']
+    user_email = session['email']
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM comments WHERE id = %s", [comment_id])
+    comment = cur.fetchone()
+
+    if comment['user_email'] != user_email:
+        return redirect(url_for('view_post', post_id=post_id))
+
+    cur.execute("UPDATE comments SET content = %s WHERE id = %s", (content, comment_id))
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('view_post', post_id=post_id))
+
+# 댓글 삭제
+@app.route('/board/<int:post_id>/comment/<int:comment_id>/delete', methods=['POST'])
+def delete_comment(post_id, comment_id):
+    if not is_logged_in():
+        return redirect(url_for('login'))
+
+    user_email = session['email']
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM comments WHERE id = %s", [comment_id])
+    comment = cur.fetchone()
+
+    if comment['user_email'] != user_email:
+        return redirect(url_for('view_post', post_id=post_id))
+
+    cur.execute("DELETE FROM comments WHERE id = %s", [comment_id])
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('view_post', post_id=post_id))
 
 @app.route('/board/<int:post_id>/delete', methods=['POST'])
 def delete_post(post_id):
