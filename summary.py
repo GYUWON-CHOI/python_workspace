@@ -2,7 +2,7 @@ from openai import OpenAI
 import os
 import re
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="")
 
 def extract_title(content):
     title_pattern = r'Title: (.*)$'
