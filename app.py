@@ -12,7 +12,7 @@ import os
 import requests
 
 app = Flask(__name__)
-api_key = '0dbafd19fb31e198e2ed51d414bde931'
+api_key = ''
 
 # MySQL 설정
 app.config['MYSQL_HOST'] = 'localhost'
